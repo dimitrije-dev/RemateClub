@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: remate-club-backend
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/remate_club}
+    username: ${SPRING_DATASOURCE_USERNAME:remate}
+    password: ${SPRING_DATASOURCE_PASSWORD:remate}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+remate-club:
+  security:
+    jwt:
+      issuer: ${JWT_ISSUER:remate-club}
+      secret: ${JWT_SECRET:change-this-development-secret-with-at-least-32-characters}
+

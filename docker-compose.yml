@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: remate-club-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-remate_club}
+      POSTGRES_USER: ${POSTGRES_USER:-remate}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-remate}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-remate} -d ${POSTGRES_DB:-remate_club}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    container_name: remate-club-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-remate_club}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-remate}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-remate}
+      JWT_ISSUER: ${JWT_ISSUER:-remate-club}
+      JWT_SECRET: ${JWT_SECRET:-change-this-development-secret-with-at-least-32-characters}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: remate-club-frontend
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+
+volumes:
+  postgres_data:
+
