@@ -11,6 +11,10 @@
 .env.*
 !.env.example
 
+# Local planning exports
+assets/notion/
+Asstets/notion/
+
 # Logs
 *.log
 npm-debug.log*
@@ -28,4 +32,3 @@ frontend/coverage/
 
 # Docker
 *.pid
-
