@@ -12,6 +12,7 @@
 !.env.example
 
 # Local planning exports
+docs/
 assets/notion/
 Asstets/notion/
 

@@ -8,7 +8,6 @@ This repository is initialized as a monorepo:
 remate-club/
   backend/
   frontend/
-  docs/
   assets/
   docker-compose.yml
   README.md
@@ -106,9 +105,4 @@ http://localhost:5173
 
 ## Next Implementation Cycle
 
-See:
-
-- `docs/implementation-plan.md`
-- `docs/architecture.md`
-- `assets/notion/remate-club-tasks.csv`
-
+The next implementation cycle focuses on authentication and the user model before moving into clubs, courts, and bookings.
