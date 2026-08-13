@@ -1,6 +1,7 @@
 package com.remateclub.security;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import com.remateclub.auth.RefreshTokenProperties;
 import javax.crypto.SecretKey;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -17,12 +18,14 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@EnableConfigurationProperties(JwtProperties.class)
+@EnableConfigurationProperties({ JwtProperties.class, RefreshTokenProperties.class })
 class SecurityConfig {
 
   @Bean
@@ -35,6 +38,9 @@ class SecurityConfig {
       )
       .authorizeHttpRequests(auth -> auth
         .requestMatchers(
+          "/api/auth/register",
+          "/api/auth/login",
+          "/api/auth/refresh",
           "/api/health",
           "/v3/api-docs/**",
           "/swagger-ui/**",
@@ -43,6 +49,11 @@ class SecurityConfig {
         .anyRequest().authenticated()
       )
       .build();
+  }
+
+  @Bean
+  PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
   }
 
   @Bean

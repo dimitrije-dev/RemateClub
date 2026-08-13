@@ -30,3 +30,5 @@ remate-club:
       issuer: ${JWT_ISSUER:remate-club}
       secret: ${JWT_SECRET:change-this-development-secret-with-at-least-32-characters}
       access-token-ttl: ${JWT_ACCESS_TOKEN_TTL:PT15M}
+    refresh-token:
+      ttl: ${JWT_REFRESH_TOKEN_TTL:P30D}

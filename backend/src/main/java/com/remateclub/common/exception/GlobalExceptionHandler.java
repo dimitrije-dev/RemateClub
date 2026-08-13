@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -106,6 +107,36 @@ public class GlobalExceptionHandler {
       .body(ErrorResponse.of(
         HttpStatus.CONFLICT,
         "CONFLICT",
+        exception.getMessage(),
+        request.getRequestURI()
+      ));
+  }
+
+  @ExceptionHandler(BadRequestException.class)
+  ResponseEntity<ErrorResponse> handleBadRequestException(
+    BadRequestException exception,
+    HttpServletRequest request
+  ) {
+    return ResponseEntity
+      .badRequest()
+      .body(ErrorResponse.of(
+        HttpStatus.BAD_REQUEST,
+        "BAD_REQUEST",
+        exception.getMessage(),
+        request.getRequestURI()
+      ));
+  }
+
+  @ExceptionHandler(BadCredentialsException.class)
+  ResponseEntity<ErrorResponse> handleBadCredentials(
+    BadCredentialsException exception,
+    HttpServletRequest request
+  ) {
+    return ResponseEntity
+      .status(HttpStatus.UNAUTHORIZED)
+      .body(ErrorResponse.of(
+        HttpStatus.UNAUTHORIZED,
+        "UNAUTHORIZED",
         exception.getMessage(),
         request.getRequestURI()
       ));

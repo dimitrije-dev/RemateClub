@@ -254,6 +254,12 @@ Implemented or scaffolded:
 - Local PostgreSQL container with persistent volume and healthcheck.
 - Spring Boot backend foundation with Java 21, Maven, Security, JPA, Flyway, PostgreSQL driver, and Swagger/OpenAPI.
 - Backend health endpoint at `/api/health`.
+- User domain with roles, statuses, BCrypt password hashing, and users Flyway migration.
+- Auth endpoints for registration, login, and current-user context.
+- Refresh endpoint with hashed opaque token storage and rotation.
+- JWT access token creation and validation through Spring Security Resource Server.
+- DB-backed refresh token model prepared for secure token renewal.
+- Consistent backend JSON error handling.
 - React + Vite + TypeScript frontend foundation.
 - Landing, login, registration, and not-found pages.
 - Shared frontend button component, app layout, router setup, API client, Tailwind configuration, and tests.
@@ -261,12 +267,9 @@ Implemented or scaffolded:
 
 Next priorities:
 
-- Add global exception handler with consistent JSON errors.
-- Add user entity, role/status enums, and Flyway users migration.
-- Implement register, login, refresh, and current-user endpoints.
-- Add BCrypt password hashing and JWT access tokens.
-- Add refresh token persistence and revocation-ready session model.
 - Build protected frontend auth flow connected to backend endpoints.
+- Add frontend auth state, protected routes, and form validation.
+- Continue into clubs, courts, ownership rules, and booking foundation.
 
 <br />
 

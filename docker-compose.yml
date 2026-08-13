@@ -31,6 +31,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-remate}
       JWT_ISSUER: ${JWT_ISSUER:-remate-club}
       JWT_SECRET: ${JWT_SECRET:-change-this-development-secret-with-at-least-32-characters}
+      JWT_ACCESS_TOKEN_TTL: ${JWT_ACCESS_TOKEN_TTL:-PT15M}
+      JWT_REFRESH_TOKEN_TTL: ${JWT_REFRESH_TOKEN_TTL:-P30D}
     ports:
       - "${BACKEND_PORT:-8080}:8080"
 
@@ -45,4 +47,3 @@ services:
 
 volumes:
   postgres_data:
-
