@@ -3,6 +3,7 @@ package com.remateclub.security;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.remateclub.auth.RefreshTokenProperties;
 import javax.crypto.SecretKey;
+import java.util.List;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,18 +22,30 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@EnableConfigurationProperties({ JwtProperties.class, RefreshTokenProperties.class })
+@EnableConfigurationProperties({ JwtProperties.class, RefreshTokenProperties.class, CorsProperties.class })
 class SecurityConfig {
 
   @Bean
-  SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  SecurityFilterChain securityFilterChain(
+    HttpSecurity http,
+    RestAuthenticationEntryPoint authenticationEntryPoint,
+    RestAccessDeniedHandler accessDeniedHandler
+  ) throws Exception {
     return http
       .csrf(csrf -> csrf.disable())
+      .cors(cors -> { })
       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+      .exceptionHandling(errors -> errors
+        .authenticationEntryPoint(authenticationEntryPoint)
+        .accessDeniedHandler(accessDeniedHandler)
+      )
       .oauth2ResourceServer(oauth2 -> oauth2
         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
       )
@@ -49,6 +62,20 @@ class SecurityConfig {
         .anyRequest().authenticated()
       )
       .build();
+  }
+
+  @Bean
+  CorsConfigurationSource corsConfigurationSource(CorsProperties corsProperties) {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowedOrigins(corsProperties.allowedOrigins());
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+    configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+    configuration.setAllowCredentials(true);
+    configuration.setMaxAge(3600L);
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/api/**", configuration);
+    return source;
   }
 
   @Bean

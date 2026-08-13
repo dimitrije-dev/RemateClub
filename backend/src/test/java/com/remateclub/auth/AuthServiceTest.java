@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -73,7 +74,7 @@ class AuthServiceTest {
   @Test
   void registersUserWithBcryptPasswordHashAndAccessToken() {
     when(userRepository.existsByEmail("player@example.com")).thenReturn(false);
-    when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+    when(userRepository.saveAndFlush(any(User.class))).thenAnswer(invocation -> {
       User user = invocation.getArgument(0);
       setId(user, UUID.randomUUID());
       return user;
@@ -89,7 +90,7 @@ class AuthServiceTest {
     ));
 
     ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-    verify(userRepository).save(userCaptor.capture());
+    verify(userRepository).saveAndFlush(userCaptor.capture());
     User savedUser = userCaptor.getValue();
 
     assertThat(savedUser.getEmail()).isEqualTo("player@example.com");
@@ -112,6 +113,23 @@ class AuthServiceTest {
   @Test
   void rejectsDuplicateEmailDuringRegistration() {
     when(userRepository.existsByEmail("player@example.com")).thenReturn(true);
+
+    assertThatThrownBy(() -> authService.register(new RegisterRequest(
+        "player@example.com",
+        "strongPassword123",
+        "Nikola",
+        "Jokic",
+        UserRole.PLAYER
+      )))
+      .isInstanceOf(ConflictException.class)
+      .hasMessage("Email already exists");
+  }
+
+  @Test
+  void mapsDatabaseEmailRaceToConflict() {
+    when(userRepository.existsByEmail("player@example.com")).thenReturn(false);
+    when(userRepository.saveAndFlush(any(User.class)))
+      .thenThrow(new DataIntegrityViolationException("unique email"));
 
     assertThatThrownBy(() -> authService.register(new RegisterRequest(
         "player@example.com",
@@ -205,7 +223,7 @@ class AuthServiceTest {
     );
     setId(user, userId);
 
-    when(refreshTokenRepository.findByTokenHash(refreshTokenService.hashToken(rawRefreshToken)))
+    when(refreshTokenRepository.findByTokenHashForUpdate(refreshTokenService.hashToken(rawRefreshToken)))
       .thenReturn(Optional.of(currentRefreshToken));
     stubRefreshTokenSave();
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -226,7 +244,7 @@ class AuthServiceTest {
   @Test
   void rejectsInvalidRefreshToken() {
     String rawRefreshToken = "missing-refresh-token";
-    when(refreshTokenRepository.findByTokenHash(refreshTokenService.hashToken(rawRefreshToken)))
+    when(refreshTokenRepository.findByTokenHashForUpdate(refreshTokenService.hashToken(rawRefreshToken)))
       .thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> authService.refresh(new RefreshRequest(rawRefreshToken)))

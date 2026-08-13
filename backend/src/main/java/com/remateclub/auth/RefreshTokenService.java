@@ -9,6 +9,7 @@ import java.util.Base64;
 import java.util.HexFormat;
 import java.util.UUID;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ public class RefreshTokenService {
   private final RefreshTokenProperties refreshTokenProperties;
   private final SecureRandom secureRandom;
 
+  @Autowired
   public RefreshTokenService(
     RefreshTokenRepository refreshTokenRepository,
     RefreshTokenProperties refreshTokenProperties
@@ -66,11 +68,6 @@ public class RefreshTokenService {
     return replacementSession;
   }
 
-  @Transactional(readOnly = true)
-  public UUID userIdForActiveToken(String rawToken) {
-    return requireActiveToken(rawToken, Instant.now()).getUserId();
-  }
-
   String hashToken(String token) {
     try {
       MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -88,7 +85,7 @@ public class RefreshTokenService {
   }
 
   private RefreshToken requireActiveToken(String rawToken, Instant now) {
-    return refreshTokenRepository.findByTokenHash(hashToken(rawToken))
+    return refreshTokenRepository.findByTokenHashForUpdate(hashToken(rawToken))
       .filter(refreshToken -> refreshToken.isActive(now))
       .orElseThrow(() -> new BadCredentialsException("Invalid refresh token"));
   }

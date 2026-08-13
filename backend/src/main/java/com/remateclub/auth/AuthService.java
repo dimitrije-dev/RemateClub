@@ -11,6 +11,7 @@ import com.remateclub.user.UserRole;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -56,7 +57,14 @@ public class AuthService {
       request.role()
     );
 
-    return authResponse(userRepository.save(user));
+    User savedUser;
+    try {
+      savedUser = userRepository.saveAndFlush(user);
+    } catch (DataIntegrityViolationException exception) {
+      throw new ConflictException("Email already exists");
+    }
+
+    return authResponse(savedUser);
   }
 
   @Transactional(readOnly = true)
@@ -72,11 +80,10 @@ public class AuthService {
 
   @Transactional
   public AuthResponse refresh(RefreshRequest request) {
-    UUID userId = refreshTokenService.userIdForActiveToken(request.refreshToken());
-    User user = userRepository.findById(userId)
+    RefreshTokenSession refreshToken = refreshTokenService.rotate(request.refreshToken());
+    User user = userRepository.findById(refreshToken.userId())
       .filter(User::canAuthenticate)
       .orElseThrow(() -> new BadCredentialsException("Invalid refresh token"));
-    RefreshTokenSession refreshToken = refreshTokenService.rotate(request.refreshToken());
 
     return authResponse(user, refreshToken);
   }
