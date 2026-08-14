@@ -4,7 +4,7 @@
 
 # Remate Club
 
-Remate Club je full-stack platforma za pronalaženje padel klubova, proveru slobodnih termina i rezervaciju terena. Aplikacija ima odvojene tokove za igrače, vlasnike klubova i administratore, dok backend kontroliše cenu, dostupnost, ownership i zaštitu od duplog bukiranja.
+Remate Club je full-stack platforma za pronalaženje padel klubova, proveru slobodnih termina i rezervaciju terena. Aplikacija ima odvojene tokove za igrače, vlasnike klubova i administratore, dok backend kontroliše cenu, dostupnost, ownership i zaštitu od duplog bookinga.
 
 ## Šta trenutno radi
 
