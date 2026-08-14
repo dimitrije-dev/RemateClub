@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.remateclub.auth.RefreshTokenRepository;
 import com.remateclub.court.Court;
+import com.remateclub.court.CourtEnvironment;
 import com.remateclub.court.CourtRepository;
 import com.remateclub.court.CourtType;
 import com.remateclub.security.JwtTokenService;
@@ -11,6 +12,8 @@ import com.remateclub.user.User;
 import com.remateclub.user.UserRepository;
 import com.remateclub.user.UserRole;
 import java.util.List;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -316,10 +319,19 @@ class ClubOwnershipIntegrationTest {
     String ownerToken = register("public-list-owner@example.com", "OWNER");
     UUID approvedClubId = createClub(ownerToken, "Alfa padel", "Beograd");
     createClub(ownerToken, "Klub na cekanju", "Nis");
-    approveClub(approvedClubId);
+    Club approvedClub = approveClub(approvedClubId);
+    courtRepository.saveAndFlush(new Court(
+      approvedClub,
+      "Outdoor teren",
+      CourtType.PANORAMIC,
+      CourtEnvironment.OUTDOOR,
+      true,
+      new BigDecimal("2800.00")
+    ));
+    LocalDate date = LocalDate.now().plusDays(2);
 
     ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
-      "/api/clubs",
+      "/api/clubs?date=" + date,
       HttpMethod.GET,
       HttpEntity.EMPTY,
       JSON_LIST
@@ -330,7 +342,10 @@ class ClubOwnershipIntegrationTest {
       assertThat(club)
         .containsEntry("id", approvedClubId.toString())
         .containsEntry("name", "Alfa padel")
-        .containsEntry("status", "APPROVED");
+        .containsEntry("status", "APPROVED")
+        .containsEntry("minimumHourlyPrice", 2800.00)
+        .containsEntry("environments", List.of("OUTDOOR"));
+      assertThat(club.get("earliestAvailableAt")).isNotNull();
     });
   }
 

@@ -16,7 +16,7 @@ Base URL za lokalni razvoj je `http://localhost:8080/api`. Za zaštićene rute k
 
 | Method | Ruta | Pristup | Namena |
 | --- | --- | --- | --- |
-| GET | `/clubs` | Public | Samo odobreni klubovi |
+| GET | `/clubs?date=YYYY-MM-DD` | Public | Odobreni klubovi sa minimalnom cenom, tipovima terena, indoor/outdoor vrednostima i najranijim slobodnim terminom za datum |
 | GET | `/clubs/{clubId}` | Public | Detalji odobrenog kluba |
 | GET | `/clubs/{clubId}/courts` | Public | Aktivni tereni odobrenog kluba |
 | GET | `/clubs/{clubId}/images` | Public | Cover i galerija odobrenog kluba |
@@ -31,6 +31,7 @@ Base URL za lokalni razvoj je `http://localhost:8080/api`. Za zaštićene rute k
 | GET | `/bookings/me` | PLAYER | Rezervacije prijavljenog igrača |
 | GET | `/bookings/{bookingId}` | Player, owning OWNER ili ADMIN | Detalji rezervacije |
 | PATCH | `/bookings/{bookingId}/cancel` | Player, owning OWNER ili ADMIN | Otkazivanje potvrđene rezervacije |
+| PATCH | `/bookings/{bookingId}/reschedule` | Owning PLAYER | Promena termina uz lock, ponovnu overlap proveru i novi backend obračun cene |
 | GET | `/owner/bookings` | OWNER | Rezervacije kroz sve klubove prijavljenog vlasnika |
 
 ## Owner upravljanje
@@ -39,10 +40,10 @@ Base URL za lokalni razvoj je `http://localhost:8080/api`. Za zaštićene rute k
 | --- | --- | --- | --- |
 | GET | `/owner/clubs` | OWNER | Klubovi prijavljenog vlasnika |
 | POST | `/owner/clubs` | OWNER | Kreiranje kluba u `PENDING_APPROVAL` statusu |
-| PUT | `/owner/clubs/{clubId}` | Owning OWNER | Izmena osnovnih podataka kluba |
+| PUT | `/owner/clubs/{clubId}` | Owning OWNER | Izmena naziva, grada, adrese i koordinata kluba |
 | GET | `/owner/clubs/{clubId}/courts` | Owning OWNER | Svi tereni owned kluba |
-| POST | `/owner/clubs/{clubId}/courts` | Owning OWNER | Kreiranje terena |
-| PUT | `/owner/clubs/{clubId}/courts/{courtId}` | Owning OWNER | Izmena terena, tipa, cene i aktivnosti |
+| POST | `/owner/clubs/{clubId}/courts` | Owning OWNER | Kreiranje terena sa tipom, indoor/outdoor okruženjem i cenom |
+| PUT | `/owner/clubs/{clubId}/courts/{courtId}` | Owning OWNER | Izmena terena, tipa, okruženja, cene i aktivnosti |
 | GET | `/owner/clubs/{clubId}/images` | Owning OWNER | Sve slike kluba, uključujući klub na čekanju |
 | POST | `/owner/clubs/{clubId}/images` | Owning OWNER | Multipart upload JPEG/PNG/WebP slike, alt teksta i cover zastavice |
 | PATCH | `/owner/clubs/{clubId}/images/{imageId}/cover` | Owning OWNER | Postavljanje glavne slike |

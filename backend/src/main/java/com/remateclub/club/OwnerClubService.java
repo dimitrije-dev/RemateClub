@@ -25,6 +25,13 @@ public class OwnerClubService {
     User owner = userRepository.findById(ownerId)
       .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     Club club = new Club(owner, request.name().trim(), request.city().trim());
+    club.update(
+      request.name().trim(),
+      request.city().trim(),
+      normalize(request.address()),
+      request.latitude(),
+      request.longitude()
+    );
     return ClubResponse.from(clubRepository.saveAndFlush(club));
   }
 
@@ -37,7 +44,13 @@ public class OwnerClubService {
       throw new AccessDeniedException("Owner cannot manage another owner's club");
     }
 
-    club.update(request.name().trim(), request.city().trim());
+    club.update(
+      request.name().trim(),
+      request.city().trim(),
+      normalize(request.address()),
+      request.latitude(),
+      request.longitude()
+    );
     return ClubResponse.from(club);
   }
 
@@ -47,5 +60,9 @@ public class OwnerClubService {
       .stream()
       .map(ClubResponse::from)
       .toList();
+  }
+
+  private String normalize(String value) {
+    return value == null || value.isBlank() ? null : value.trim();
   }
 }

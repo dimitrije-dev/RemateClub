@@ -3,6 +3,7 @@ package com.remateclub.common.config;
 import com.remateclub.club.Club;
 import com.remateclub.club.ClubRepository;
 import com.remateclub.court.Court;
+import com.remateclub.court.CourtEnvironment;
 import com.remateclub.court.CourtRepository;
 import com.remateclub.court.CourtType;
 import com.remateclub.user.User;
@@ -52,13 +53,21 @@ public class DevDataSeeder implements ApplicationRunner {
     }
 
     Club approvedClub = new Club(owner, "Remate Arena Dorćol", "Beograd");
+    approvedClub.update(
+      approvedClub.getName(),
+      approvedClub.getCity(),
+      "Dunavski kej 23, Beograd",
+      new BigDecimal("44.823300"),
+      new BigDecimal("20.459100")
+    );
+    approvedClub.updateRating(new BigDecimal("4.8"), 126);
     approvedClub.approve();
     clubRepository.saveAndFlush(approvedClub);
     clubRepository.saveAndFlush(new Club(owner, "Remate Padel Novi Beograd", "Beograd"));
 
     courtRepository.saveAllAndFlush(List.of(
-      new Court(approvedClub, "Centralni panoramski", CourtType.PANORAMIC, true, new BigDecimal("3600.00")),
-      new Court(approvedClub, "Teren 2", CourtType.STANDARD, true, new BigDecimal("3000.00"))
+      new Court(approvedClub, "Centralni panoramski", CourtType.PANORAMIC, CourtEnvironment.OUTDOOR, true, new BigDecimal("3600.00")),
+      new Court(approvedClub, "Teren 2", CourtType.STANDARD, CourtEnvironment.INDOOR, true, new BigDecimal("3000.00"))
     ));
   }
 

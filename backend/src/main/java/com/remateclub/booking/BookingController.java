@@ -55,6 +55,16 @@ public class BookingController {
     return bookingService.cancel(subject(jwt), roles(jwt), bookingId);
   }
 
+  @PatchMapping("/{bookingId}/reschedule")
+  @PreAuthorize("hasRole('PLAYER')")
+  BookingResponse reschedule(
+    @AuthenticationPrincipal Jwt jwt,
+    @PathVariable UUID bookingId,
+    @Valid @RequestBody RescheduleBookingRequest request
+  ) {
+    return bookingService.reschedule(subject(jwt), bookingId, request);
+  }
+
   private UUID subject(Jwt jwt) {
     try {
       return UUID.fromString(jwt.getSubject());

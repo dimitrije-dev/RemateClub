@@ -1,6 +1,7 @@
 package com.remateclub.club;
 
 import java.time.Instant;
+import java.math.BigDecimal;
 import java.util.UUID;
 import com.remateclub.clubimage.ClubImage;
 
@@ -9,6 +10,11 @@ public record ClubResponse(
   UUID ownerId,
   String name,
   String city,
+  String address,
+  BigDecimal latitude,
+  BigDecimal longitude,
+  BigDecimal averageRating,
+  int reviewCount,
   ClubStatus status,
   Instant createdAt,
   Instant updatedAt,
@@ -21,6 +27,11 @@ public record ClubResponse(
       club.getOwner().getId(),
       club.getName(),
       club.getCity(),
+      club.getAddress(),
+      club.getLatitude(),
+      club.getLongitude(),
+      club.getAverageRating(),
+      club.getReviewCount(),
       club.getStatus(),
       club.getCreatedAt(),
       club.getUpdatedAt(),

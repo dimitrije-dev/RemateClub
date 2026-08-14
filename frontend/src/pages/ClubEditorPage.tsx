@@ -14,15 +14,35 @@ export function ClubEditorPage() {
   const isEditing = Boolean(clubId);
   const [name, setName] = useState('');
   const [city, setCity] = useState('');
+  const [address, setAddress] = useState('');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const clubsQuery = useQuery({ queryKey: ['owner-clubs'], queryFn: remateApi.getOwnerClubs, enabled: isEditing });
   const club = clubsQuery.data?.find((item) => item.id === clubId);
 
-  useEffect(() => { if (club) { setName(club.name); setCity(club.city); } }, [club]);
+  useEffect(() => {
+    if (club) {
+      setName(club.name);
+      setCity(club.city);
+      setAddress(club.address ?? '');
+      setLatitude(club.latitude == null ? '' : String(club.latitude));
+      setLongitude(club.longitude == null ? '' : String(club.longitude));
+    }
+  }, [club]);
   const mutation = useMutation({
-    mutationFn: () => isEditing && clubId ? remateApi.updateClub(clubId, { name, city }) : remateApi.createClub({ name, city }),
+    mutationFn: () => {
+      const payload = {
+        name,
+        city,
+        address: address.trim() || undefined,
+        latitude: latitude ? Number(latitude) : undefined,
+        longitude: longitude ? Number(longitude) : undefined,
+      };
+      return isEditing && clubId ? remateApi.updateClub(clubId, payload) : remateApi.createClub(payload);
+    },
     onSuccess: async () => { await queryClient.invalidateQueries({ queryKey: ['owner-clubs'] }); navigate('/owner/clubs'); },
     onError: (mutationError) => setError(getApiErrorMessage(mutationError, 'Klub nije sačuvan.')),
   });
@@ -30,6 +50,15 @@ export function ClubEditorPage() {
   function submit(event: FormEvent) {
     event.preventDefault(); setError('');
     if (!name.trim() || !city.trim()) { setError('Naziv i grad su obavezni.'); return; }
+    if ((latitude && !Number.isFinite(Number(latitude))) || (longitude && !Number.isFinite(Number(longitude)))) {
+      setError('Koordinate moraju biti ispravni brojevi.'); return;
+    }
+    if ((latitude && (Number(latitude) < -90 || Number(latitude) > 90)) || (longitude && (Number(longitude) < -180 || Number(longitude) > 180))) {
+      setError('Geografska širina mora biti između -90 i 90, a dužina između -180 i 180.'); return;
+    }
+    if (Boolean(latitude) !== Boolean(longitude)) {
+      setError('Unesi obe koordinate ili ostavi oba polja prazna.'); return;
+    }
     mutation.mutate();
   }
 
@@ -45,6 +74,12 @@ export function ClubEditorPage() {
           {error && <p className="auth-error">{error}</p>}
           <Input label="Naziv kluba" value={name} onChange={(event) => setName(event.target.value)} leadingIcon={<Building2 size={18} />} maxLength={160} />
           <Input label="Grad" value={city} onChange={(event) => setCity(event.target.value)} leadingIcon={<MapPin size={18} />} maxLength={120} />
+          <Input label="Adresa" value={address} onChange={(event) => setAddress(event.target.value)} leadingIcon={<MapPin size={18} />} maxLength={255} placeholder="Ulica i broj" />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input label="Geografska širina" type="number" min="-90" max="90" step="0.000001" value={latitude} onChange={(event) => setLatitude(event.target.value)} placeholder="44.817600" />
+            <Input label="Geografska dužina" type="number" min="-180" max="180" step="0.000001" value={longitude} onChange={(event) => setLongitude(event.target.value)} placeholder="20.463300" />
+          </div>
+          <p className="text-xs text-remate-muted">Koordinate omogućavaju sortiranje klubova po udaljenosti i otvaranje lokacije na mapi.</p>
           <Button type="submit" isLoading={mutation.isPending} icon={<Save size={18} />} className="w-full">{isEditing ? 'Sačuvaj izmene' : 'Kreiraj klub'}</Button>
         </form>
       </div>

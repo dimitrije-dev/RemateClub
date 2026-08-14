@@ -109,8 +109,58 @@ public class BookingService {
     if (booking.getStatus() != BookingStatus.CONFIRMED) {
       throw new ConflictException("Only confirmed bookings can be cancelled");
     }
+    if (!booking.getStartAt().isAfter(Instant.now())) {
+      throw new ConflictException("A booking can only be cancelled before it starts");
+    }
 
     booking.cancel();
+    return BookingResponse.from(booking);
+  }
+
+  @Transactional
+  public BookingResponse reschedule(
+    UUID playerId,
+    UUID bookingId,
+    RescheduleBookingRequest request
+  ) {
+    validatePeriod(request.startAt(), request.endAt());
+    Booking booking = bookingRepository.findByIdForUpdate(bookingId)
+      .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+
+    if (!booking.getPlayer().getId().equals(playerId)) {
+      throw new AccessDeniedException("Booking access is denied");
+    }
+    if (booking.getStatus() != BookingStatus.CONFIRMED) {
+      throw new ConflictException("Only confirmed bookings can be rescheduled");
+    }
+    if (!booking.getStartAt().isAfter(Instant.now())) {
+      throw new ConflictException("A booking can only be rescheduled before it starts");
+    }
+
+    Court court = courtRepository.findByIdForUpdate(booking.getCourt().getId())
+      .orElseThrow(() -> new ResourceNotFoundException("Court not found"));
+    if (!court.isActive() || court.getClub().getStatus() != ClubStatus.APPROVED) {
+      throw new ResourceNotFoundException("Court not found");
+    }
+    if (bookingRepository.existsOverlappingExcluding(
+      court.getId(),
+      bookingId,
+      BookingStatus.CONFIRMED,
+      request.startAt(),
+      request.endAt()
+    ) || courtBlockRepository.existsOverlapping(
+      court.getId(),
+      request.startAt(),
+      request.endAt()
+    )) {
+      throw new BookingTimeUnavailableException();
+    }
+
+    booking.reschedule(
+      request.startAt(),
+      request.endAt(),
+      calculatePrice(court.getHourlyPrice(), request.startAt(), request.endAt())
+    );
     return BookingResponse.from(booking);
   }
 

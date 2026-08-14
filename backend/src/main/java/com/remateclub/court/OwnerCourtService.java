@@ -36,6 +36,7 @@ public class OwnerCourtService {
       club,
       request.name().trim(),
       request.type(),
+      request.environment() == null ? CourtEnvironment.INDOOR : request.environment(),
       request.active(),
       request.hourlyPrice()
     );
@@ -56,6 +57,7 @@ public class OwnerCourtService {
     court.update(
       request.name().trim(),
       request.type(),
+      request.environment() == null ? CourtEnvironment.INDOOR : request.environment(),
       request.active(),
       request.hourlyPrice()
     );

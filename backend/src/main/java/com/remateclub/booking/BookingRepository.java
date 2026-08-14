@@ -28,6 +28,23 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
   );
 
   @Query("""
+    select (count(booking) > 0)
+    from Booking booking
+    where booking.court.id = :courtId
+      and booking.id <> :bookingId
+      and booking.status = :status
+      and booking.startAt < :endAt
+      and booking.endAt > :startAt
+    """)
+  boolean existsOverlappingExcluding(
+    @Param("courtId") UUID courtId,
+    @Param("bookingId") UUID bookingId,
+    @Param("status") BookingStatus status,
+    @Param("startAt") Instant startAt,
+    @Param("endAt") Instant endAt
+  );
+
+  @Query("""
     select booking
     from Booking booking
     where booking.court.id = :courtId

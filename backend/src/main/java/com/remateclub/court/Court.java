@@ -46,6 +46,10 @@ public class Court {
   @Column(nullable = false, length = 30)
   private CourtType type;
 
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 20)
+  private CourtEnvironment environment;
+
   @Column(nullable = false)
   private boolean active;
 
@@ -62,7 +66,7 @@ public class Court {
   }
 
   public Court(Club club, String name, CourtType type, boolean active) {
-    this(club, name, type, active, new BigDecimal("3000.00"));
+    this(club, name, type, CourtEnvironment.INDOOR, active, new BigDecimal("3000.00"));
   }
 
   public Court(
@@ -72,9 +76,21 @@ public class Court {
     boolean active,
     BigDecimal hourlyPrice
   ) {
+    this(club, name, type, CourtEnvironment.INDOOR, active, hourlyPrice);
+  }
+
+  public Court(
+    Club club,
+    String name,
+    CourtType type,
+    CourtEnvironment environment,
+    boolean active,
+    BigDecimal hourlyPrice
+  ) {
     this.club = club;
     this.name = name;
     this.type = type;
+    this.environment = environment;
     this.active = active;
     this.hourlyPrice = hourlyPrice;
   }
@@ -107,6 +123,10 @@ public class Court {
     return type;
   }
 
+  public CourtEnvironment getEnvironment() {
+    return environment;
+  }
+
   public boolean isActive() {
     return active;
   }
@@ -116,8 +136,19 @@ public class Court {
   }
 
   public void update(String name, CourtType type, boolean active, BigDecimal hourlyPrice) {
+    update(name, type, environment, active, hourlyPrice);
+  }
+
+  public void update(
+    String name,
+    CourtType type,
+    CourtEnvironment environment,
+    boolean active,
+    BigDecimal hourlyPrice
+  ) {
     this.name = name;
     this.type = type;
+    this.environment = environment;
     this.active = active;
     this.hourlyPrice = hourlyPrice;
   }

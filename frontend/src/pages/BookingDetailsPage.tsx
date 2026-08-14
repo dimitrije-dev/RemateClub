@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-import { ArrowLeft, Ban, CalendarDays, Clock3, CreditCard, MapPin, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Ban, CalendarClock, CalendarDays, CalendarPlus, Clock3, CreditCard, MapPin, ShieldCheck } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { EmptyState, ErrorState, LoadingState } from '../components/common/PageStates';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { Button, ButtonLink } from '../components/ui/Button';
 import { getApiErrorMessage } from '../services/api';
 import { remateApi } from '../services/remateApi';
-import { formatDateTime, formatMoney } from '../utils/format';
+import { bookingMapUrl, downloadBookingCalendar, formatDateTime, formatMoney } from '../utils/format';
 
 export function BookingDetailsPage() {
   const { bookingId = '' } = useParams();
@@ -24,6 +24,8 @@ export function BookingDetailsPage() {
   if (query.isLoading) return <section className="page-shell"><LoadingState label="Učitavamo rezervaciju…" /></section>;
   if (query.isError || !query.data) return <section className="page-shell"><ErrorState message={getApiErrorMessage(query.error, 'Rezervacija nije dostupna.')} onRetry={() => void query.refetch()} /></section>;
   const booking = query.data;
+  const bookingDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Belgrade' }).format(new Date(booking.startAt));
+  const canChange = booking.status === 'CONFIRMED' && new Date(booking.startAt).getTime() > Date.now();
 
   return (
     <section className="page-shell max-w-4xl">
@@ -34,14 +36,17 @@ export function BookingDetailsPage() {
           <Info icon={<CalendarDays />} label="Početak" value={formatDateTime(booking.startAt)} />
           <Info icon={<Clock3 />} label="Kraj" value={formatDateTime(booking.endAt)} />
           <Info icon={<CreditCard />} label="Ukupna cena" value={formatMoney(booking.totalPrice, booking.currency)} />
-          <Info icon={<MapPin />} label="Teren" value={booking.courtId} />
+          <Info icon={<MapPin />} label="Klub i teren" value={`${booking.clubName} · ${booking.courtName}`} />
         </div>
       </div>
       <div className="mt-6 surface-card">
         <div className="flex items-start gap-3"><ShieldCheck className="mt-1 text-emerald-600" /><div><h2 className="text-xl font-black">Rezervacija je evidentirana na serveru</h2><p className="mt-1 text-remate-muted">Cena i dostupnost su provereni u trenutku kreiranja.</p></div></div>
         {cancelMutation.isError && <p className="auth-error mt-5">{getApiErrorMessage(cancelMutation.error, 'Rezervaciju nije moguće otkazati.')}</p>}
         <div className="mt-6 flex flex-wrap gap-3">
-          {booking.status === 'CONFIRMED' && <Button variant="danger" icon={<Ban size={18} />} isLoading={cancelMutation.isPending} onClick={() => cancelMutation.mutate()}>Otkaži rezervaciju</Button>}
+          {canChange && <Button variant="danger" icon={<Ban size={18} />} isLoading={cancelMutation.isPending} onClick={() => cancelMutation.mutate()}>Otkaži rezervaciju</Button>}
+          {canChange && <ButtonLink to={`/clubs/${booking.clubId}?date=${bookingDate}&reschedule=${booking.id}`} variant="tertiary" icon={<CalendarClock size={18} />}>Promeni termin</ButtonLink>}
+          <Button variant="tertiary" icon={<CalendarPlus size={18} />} onClick={() => downloadBookingCalendar(booking)}>Dodaj u kalendar</Button>
+          <a href={bookingMapUrl(booking)} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-remate-bg px-4 py-2 text-sm font-black hover:bg-slate-200"><MapPin size={17} />Otvori lokaciju</a>
           <ButtonLink to={`/clubs/${booking.clubId}`} variant="tertiary">Nazad na klub</ButtonLink>
         </div>
       </div>

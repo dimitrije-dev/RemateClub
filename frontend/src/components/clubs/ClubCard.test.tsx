@@ -20,7 +20,7 @@ describe('ClubCard', () => {
 
     expect(screen.getByRole('heading', { name: 'Remate Arena' })).toBeInTheDocument();
     expect(screen.getByText('Beograd')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Detalji/ })).toHaveAttribute('href', '/clubs/club-123');
+    expect(screen.getByRole('link', { name: /Izaberi termin/ })).toHaveAttribute('href', '/clubs/club-123');
   });
 
   it('renders the uploaded cover image when one is available', () => {

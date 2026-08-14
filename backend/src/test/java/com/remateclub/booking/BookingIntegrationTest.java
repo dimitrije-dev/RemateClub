@@ -266,6 +266,71 @@ class BookingIntegrationTest {
   }
 
   @Test
+  void playerCanRescheduleConfirmedBookingAndPriceIsRecalculated() {
+    Fixture fixture = createFixture();
+    Instant originalStart = futureDate().atTime(9, 0).atZone(BUSINESS_ZONE).toInstant();
+    UUID bookingId = UUID.fromString(createBooking(
+      fixture.playerToken(), fixture.court().getId(), originalStart, originalStart.plusSeconds(3600)
+    ).getBody().get("id").toString());
+    Instant newStart = futureDate().atTime(17, 0).atZone(BUSINESS_ZONE).toInstant();
+
+    ResponseEntity<Map<String, Object>> rescheduled = exchangeWithBearer(
+      "/api/bookings/" + bookingId + "/reschedule",
+      HttpMethod.PATCH,
+      fixture.playerToken(),
+      Map.of(
+        "startAt", newStart.toString(),
+        "endAt", newStart.plusSeconds(7200).toString()
+      )
+    );
+
+    assertThat(rescheduled.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(rescheduled.getBody())
+      .containsEntry("id", bookingId.toString())
+      .containsEntry("startAt", newStart.toString())
+      .containsEntry("status", "CONFIRMED");
+    assertThat(((Number) rescheduled.getBody().get("totalPrice")).doubleValue()).isEqualTo(4800.0);
+    Booking persisted = bookingRepository.findById(bookingId).orElseThrow();
+    assertThat(persisted.getStartAt()).isEqualTo(newStart);
+    assertThat(persisted.getEndAt()).isEqualTo(newStart.plusSeconds(7200));
+  }
+
+  @Test
+  void startedBookingCannotBeCancelledOrRescheduled() {
+    Fixture fixture = createFixture();
+    Instant startedAt = Instant.now().minusSeconds(60);
+    Booking booking = bookingRepository.saveAndFlush(new Booking(
+      fixture.player(),
+      fixture.court(),
+      startedAt,
+      startedAt.plusSeconds(3600),
+      new BigDecimal("2400.00")
+    ));
+    Instant newStart = futureDate().atTime(19, 0).atZone(BUSINESS_ZONE).toInstant();
+
+    ResponseEntity<Map<String, Object>> cancellation = exchangeWithBearer(
+      "/api/bookings/" + booking.getId() + "/cancel",
+      HttpMethod.PATCH,
+      fixture.playerToken(),
+      Map.of()
+    );
+    ResponseEntity<Map<String, Object>> reschedule = exchangeWithBearer(
+      "/api/bookings/" + booking.getId() + "/reschedule",
+      HttpMethod.PATCH,
+      fixture.playerToken(),
+      Map.of(
+        "startAt", newStart.toString(),
+        "endAt", newStart.plusSeconds(3600).toString()
+      )
+    );
+
+    assertThat(cancellation.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    assertThat(reschedule.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    assertThat(bookingRepository.findById(booking.getId()).orElseThrow().getStatus())
+      .isEqualTo(BookingStatus.CONFIRMED);
+  }
+
+  @Test
   void twoConcurrentRequestsForSameCourtAndTimeCreateOnlyOneBooking() throws Exception {
     Fixture fixture = createFixture();
     User secondPlayer = createUser("concurrent-player@example.com", UserRole.PLAYER);

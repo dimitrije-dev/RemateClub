@@ -55,7 +55,8 @@ describe('ClubDetailsPage booking validation', () => {
     const unavailable = await screen.findByRole('button', { name: /Nije dostupno/ });
     expect(unavailable).toBeDisabled();
 
-    await user.click(screen.getByRole('button', { name: /Rezerviši/ }));
+    await user.click(screen.getByRole('button', { name: /Izaberi/ }));
+    await user.click(screen.getByRole('button', { name: 'Potvrdi rezervaciju' }));
     expect(await screen.findByText('Rezervacije mogu da kreiraju samo nalozi igrača.')).toBeInTheDocument();
     expect(createBooking).not.toHaveBeenCalled();
   });
@@ -65,10 +66,40 @@ describe('ClubDetailsPage booking validation', () => {
     const user = userEvent.setup();
     renderPage(null);
 
-    await user.click(await screen.findByRole('button', { name: /Rezerviši/ }));
+    await user.click(await screen.findByRole('button', { name: /Izaberi/ }));
+    await user.click(screen.getByRole('button', { name: 'Potvrdi rezervaciju' }));
 
     expect(await screen.findByText('Login destination')).toBeInTheDocument();
     expect(createBooking).not.toHaveBeenCalled();
+  });
+
+  it('shows confirmation details and a dedicated success screen for a player', async () => {
+    vi.spyOn(remateApi, 'createBooking').mockResolvedValue({
+      id: 'booking-1',
+      playerId: player.id,
+      courtId: court.id,
+      clubId: club.id,
+      courtName: court.name,
+      clubName: club.name,
+      clubCity: club.city,
+      startAt: '2026-08-20T08:00:00Z',
+      endAt: '2026-08-20T09:00:00Z',
+      status: 'CONFIRMED',
+      totalPrice: 3000,
+      currency: 'RSD',
+      createdAt: '2026-08-14T08:00:00Z',
+      updatedAt: '2026-08-14T08:00:00Z',
+    });
+    const user = userEvent.setup();
+    renderPage(player);
+
+    await user.click(await screen.findByRole('button', { name: /Izaberi/ }));
+    await user.click(screen.getByRole('button', { name: 'Potvrdi rezervaciju' }));
+
+    expect(screen.getByRole('dialog', { name: 'Potvrdi rezervaciju' })).toBeInTheDocument();
+    expect(screen.getByText(/Remate Arena · Centralni teren/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Rezerviši i potvrdi' }));
+    expect(await screen.findByRole('heading', { name: 'Vidimo se na terenu!' })).toBeInTheDocument();
   });
 });
 

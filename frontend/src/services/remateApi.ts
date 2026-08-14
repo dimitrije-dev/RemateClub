@@ -2,6 +2,7 @@ import { api } from './api';
 
 export type ClubStatus = 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED' | 'SUSPENDED';
 export type CourtType = 'STANDARD' | 'PANORAMIC' | 'SINGLE';
+export type CourtEnvironment = 'INDOOR' | 'OUTDOOR';
 export type BookingStatus = 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
 
 export type Club = {
@@ -9,10 +10,19 @@ export type Club = {
   ownerId: string;
   name: string;
   city: string;
+  address?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  averageRating?: number;
+  reviewCount?: number;
   status: ClubStatus;
   createdAt: string;
   updatedAt: string;
   coverImageUrl?: string | null;
+  minimumHourlyPrice?: number | null;
+  courtTypes?: CourtType[];
+  environments?: CourtEnvironment[];
+  earliestAvailableAt?: string | null;
 };
 
 export type ClubImage = {
@@ -35,6 +45,7 @@ export type Court = {
   clubId: string;
   name: string;
   type: CourtType;
+  environment?: CourtEnvironment;
   active: boolean;
   hourlyPrice: number;
   createdAt: string;
@@ -46,6 +57,12 @@ export type Booking = {
   playerId: string;
   courtId: string;
   clubId: string;
+  courtName: string;
+  clubName: string;
+  clubCity: string;
+  clubAddress?: string | null;
+  clubLatitude?: number | null;
+  clubLongitude?: number | null;
   startAt: string;
   endAt: string;
   status: BookingStatus;
@@ -71,12 +88,24 @@ export type Availability = {
   slots: AvailabilitySlot[];
 };
 
-export type ClubPayload = { name: string; city: string };
-export type CourtPayload = { name: string; type: CourtType; active: boolean; hourlyPrice: number };
+export type ClubPayload = {
+  name: string;
+  city: string;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+};
+export type CourtPayload = {
+  name: string;
+  type: CourtType;
+  environment: CourtEnvironment;
+  active: boolean;
+  hourlyPrice: number;
+};
 
 export const remateApi = {
-  async getClubs() {
-    return (await api.get<Club[]>('/clubs')).data;
+  async getClubs(date?: string) {
+    return (await api.get<Club[]>('/clubs', { params: date ? { date } : undefined })).data;
   },
   async getClub(clubId: string) {
     return (await api.get<Club>(`/clubs/${clubId}`)).data;
@@ -101,6 +130,9 @@ export const remateApi = {
   },
   async cancelBooking(bookingId: string) {
     return (await api.patch<Booking>(`/bookings/${bookingId}/cancel`)).data;
+  },
+  async rescheduleBooking(bookingId: string, startAt: string, endAt: string) {
+    return (await api.patch<Booking>(`/bookings/${bookingId}/reschedule`, { startAt, endAt })).data;
   },
   async getOwnerClubs() {
     return (await api.get<Club[]>('/owner/clubs')).data;

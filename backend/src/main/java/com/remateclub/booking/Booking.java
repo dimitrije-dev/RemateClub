@@ -44,17 +44,17 @@ public class Booking {
   @JoinColumn(name = "court_id", nullable = false, updatable = false)
   private Court court;
 
-  @Column(name = "start_at", nullable = false, updatable = false)
+  @Column(name = "start_at", nullable = false)
   private Instant startAt;
 
-  @Column(name = "end_at", nullable = false, updatable = false)
+  @Column(name = "end_at", nullable = false)
   private Instant endAt;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 30)
   private BookingStatus status;
 
-  @Column(name = "total_price", nullable = false, precision = 12, scale = 2, updatable = false)
+  @Column(name = "total_price", nullable = false, precision = 12, scale = 2)
   private BigDecimal totalPrice;
 
   @Column(name = "cancelled_at")
@@ -99,6 +99,12 @@ public class Booking {
   public void cancel() {
     this.status = BookingStatus.CANCELLED;
     this.cancelledAt = Instant.now();
+  }
+
+  public void reschedule(Instant startAt, Instant endAt, BigDecimal totalPrice) {
+    this.startAt = startAt;
+    this.endAt = endAt;
+    this.totalPrice = totalPrice;
   }
 
   public UUID getId() {

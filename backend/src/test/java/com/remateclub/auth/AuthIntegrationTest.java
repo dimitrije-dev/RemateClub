@@ -83,7 +83,7 @@ class AuthIntegrationTest {
       Integer.class
     );
 
-    assertThat(latestVersion).isEqualTo("8");
+    assertThat(latestVersion).isEqualTo("9");
     assertThat(usersTableCount).isEqualTo(1);
   }
 

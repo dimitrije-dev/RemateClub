@@ -6,7 +6,7 @@ import { EmptyState, ErrorState, LoadingState } from '../components/common/PageS
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { getApiErrorMessage } from '../services/api';
-import { remateApi, type Court, type CourtPayload, type CourtType } from '../services/remateApi';
+import { remateApi, type Court, type CourtEnvironment, type CourtPayload, type CourtType } from '../services/remateApi';
 import { formatMoney } from '../utils/format';
 
 const typeLabels: Record<CourtType, string> = { STANDARD: 'Standard', PANORAMIC: 'Panoramski', SINGLE: 'Single' };
@@ -16,6 +16,7 @@ export function CourtsManagementPage() {
   const [editing, setEditing] = useState<Court | null>(null);
   const [name, setName] = useState('');
   const [type, setType] = useState<CourtType>('STANDARD');
+  const [environment, setEnvironment] = useState<CourtEnvironment>('INDOOR');
   const [active, setActive] = useState(true);
   const [hourlyPrice, setHourlyPrice] = useState('3000');
   const [error, setError] = useState('');
@@ -25,7 +26,7 @@ export function CourtsManagementPage() {
   const club = clubsQuery.data?.find((item) => item.id === clubId);
 
   useEffect(() => {
-    if (editing) { setName(editing.name); setType(editing.type); setActive(editing.active); setHourlyPrice(String(editing.hourlyPrice)); }
+    if (editing) { setName(editing.name); setType(editing.type); setEnvironment(editing.environment ?? 'INDOOR'); setActive(editing.active); setHourlyPrice(String(editing.hourlyPrice)); }
   }, [editing]);
 
   const mutation = useMutation({
@@ -36,12 +37,12 @@ export function CourtsManagementPage() {
     onError: (mutationError) => setError(getApiErrorMessage(mutationError, 'Teren nije sačuvan.')),
   });
 
-  function resetForm() { setEditing(null); setName(''); setType('STANDARD'); setActive(true); setHourlyPrice('3000'); setError(''); }
+  function resetForm() { setEditing(null); setName(''); setType('STANDARD'); setEnvironment('INDOOR'); setActive(true); setHourlyPrice('3000'); setError(''); }
   function submit(event: FormEvent) {
     event.preventDefault(); setError('');
     const price = Number(hourlyPrice);
     if (!name.trim() || !Number.isFinite(price) || price <= 0) { setError('Unesi naziv i validnu cenu terena.'); return; }
-    mutation.mutate({ name, type, active, hourlyPrice: price });
+    mutation.mutate({ name, type, environment, active, hourlyPrice: price });
   }
 
   return (
@@ -55,7 +56,7 @@ export function CourtsManagementPage() {
           {query.data?.length === 0 && <EmptyState title="Nema terena" message="Dodaj prvi teren kroz formu pored liste." />}
           {query.data?.map((court) => (
             <article key={court.id} className="surface-card flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4"><span className={`grid h-12 w-12 place-items-center rounded-xl ${court.active ? 'bg-remate-greenLight' : 'bg-slate-200 text-slate-500'}`}><RectangleHorizontal /></span><div><h2 className="font-black">{court.name}</h2><p className="mt-1 text-sm text-remate-muted">{typeLabels[court.type]} · {formatMoney(court.hourlyPrice)}/h · {court.active ? 'Aktivan' : 'Neaktivan'}</p></div></div>
+              <div className="flex items-center gap-4"><span className={`grid h-12 w-12 place-items-center rounded-xl ${court.active ? 'bg-remate-greenLight' : 'bg-slate-200 text-slate-500'}`}><RectangleHorizontal /></span><div><h2 className="font-black">{court.name}</h2><p className="mt-1 text-sm text-remate-muted">{typeLabels[court.type]} · {(court.environment ?? 'INDOOR') === 'INDOOR' ? 'Indoor' : 'Outdoor'} · {formatMoney(court.hourlyPrice)}/h · {court.active ? 'Aktivan' : 'Neaktivan'}</p></div></div>
               <Button variant="tertiary" icon={<Pencil size={16} />} onClick={() => setEditing(court)}>Uredi</Button>
             </article>
           ))}
@@ -66,6 +67,7 @@ export function CourtsManagementPage() {
             {error && <p className="auth-error">{error}</p>}
             <Input label="Naziv terena" value={name} onChange={(event) => setName(event.target.value)} leadingIcon={<RectangleHorizontal size={18} />} />
             <label className="block text-sm font-extrabold">Tip<select value={type} onChange={(event) => setType(event.target.value as CourtType)} className="form-select"><option value="STANDARD">Standard</option><option value="PANORAMIC">Panoramski</option><option value="SINGLE">Single</option></select></label>
+            <label className="block text-sm font-extrabold">Okruženje<select value={environment} onChange={(event) => setEnvironment(event.target.value as CourtEnvironment)} className="form-select"><option value="INDOOR">Indoor</option><option value="OUTDOOR">Outdoor</option></select></label>
             <Input label="Cena po satu (RSD)" type="number" min="1" step="0.01" value={hourlyPrice} onChange={(event) => setHourlyPrice(event.target.value)} leadingIcon={<CircleDollarSign size={18} />} />
             <label className="flex items-center gap-3 rounded-xl bg-remate-bg p-3 text-sm font-bold"><input type="checkbox" checked={active} onChange={(event) => setActive(event.target.checked)} className="h-5 w-5 accent-emerald-600" /> Teren je aktivan za rezervacije</label>
             <div className="flex gap-2"><Button type="submit" isLoading={mutation.isPending} icon={<Save size={17} />} className="flex-1">Sačuvaj</Button>{editing && <Button variant="tertiary" onClick={resetForm}>Otkaži</Button>}</div>

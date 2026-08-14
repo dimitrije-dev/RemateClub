@@ -8,11 +8,12 @@ Remate Club je full-stack platforma za pronalaženje padel klubova, proveru slob
 
 ## Šta trenutno radi
 
-- Javni landing, pretraga klubova, cover fotografije i galerija odobrenog kluba.
-- Pregled terena, cena i slobodnih termina po datumu.
+- Javni landing i napredna pretraga po datumu, gradu, ceni, indoor/outdoor okruženju, dostupnosti, oceni i udaljenosti; filteri ostaju u URL-u.
+- Kartice klubova prikazuju cover, ocenu, početnu cenu i najraniji slobodan termin za izabrani datum.
+- Pregled terena, cena i slobodnih termina sa sticky rezimeom, potvrdom i posebnim success ekranom.
 - Registracija i prijava za `PLAYER` i `OWNER` naloge.
 - JWT access token i rotirajući refresh token.
-- Igrač kreira, pregleda i otkazuje svoje rezervacije.
+- Igrač kreira, pregleda, pomera i otkazuje rezervacije, dodaje ih u kalendar i otvara lokaciju kluba.
 - Vlasnik kreira i uređuje klubove i terene i prati rezervacije.
 - Vlasnik dodaje do osam fotografija, bira cover sliku i briše fotografije kluba.
 - Administrator pregleda, odobrava i odbija klubove na čekanju.
@@ -115,23 +116,25 @@ Frontend koristi `VITE_API_BASE_URL` iz [frontend/.env.example](frontend/.env.ex
 ### Javni deo
 
 1. Otvori `/` i unesi grad u hero pretragu.
-2. Na `/clubs` filtriraj odobrene klubove po nazivu ili gradu.
-3. Otvori `/clubs/{clubId}`, izaberi teren i datum.
-4. Slobodni slot prikazuje backend cenu; zauzeti ili blokirani slot je onemogućen.
+2. Na `/clubs` izaberi datum i filtriraj po gradu, indoor/outdoor terenu, ceni ili opciji **Slobodno danas**. Filteri se mogu podeliti kopiranjem URL-a.
+3. Za sortiranje po udaljenosti dozvoli pristup lokaciji preko dugmeta **Koristi moju lokaciju**.
+4. Kartica prikazuje najraniji slobodan termin; otvori `/clubs/{clubId}` i izaberi teren, datum i slot.
+5. Slobodni slot prikazuje backend cenu; zauzeti ili blokirani slot je onemogućen.
 
 ### Igrač
 
 1. Prijavi se kao `player@remate.local` ili registruj novi PLAYER nalog.
-2. Izaberi slobodan termin na detaljima kluba i potvrdi ga klikom na slot.
-3. `/bookings` prikazuje istoriju, a `/bookings/{bookingId}` detalje i otkazivanje.
-4. `/profile` prikazuje identitet, status i prečicu ka rezervacijama.
+2. Izaberi slobodan termin na detaljima kluba, proveri rezime i potvrdi rezervaciju u modalu.
+3. Posle uspeha otvara se potvrda sa cenom i prečicom ka detaljima rezervacije.
+4. `/bookings` deli rezervacije na predstojeće, završene i otkazane i nudi detalje, otkazivanje, promenu termina, kalendar i mapu.
+5. `/profile` prikazuje identitet, status i prečicu ka rezervacijama.
 
 ### Vlasnik
 
 1. Prijavi se kao `owner@remate.local`.
 2. `/owner` prikazuje KPI pregled i brze akcije.
 3. `/owner/clubs` prikazuje klubove; novi klub ulazi u `PENDING_APPROVAL`.
-4. Editor menja naziv i grad, a ekran terena dodaje/menja tip, cenu i aktivnost.
+4. Editor menja naziv, grad, adresu i koordinate, a ekran terena dodaje/menja tip, indoor/outdoor okruženje, cenu i aktivnost.
 5. `/owner/reservations` prikazuje rezervacije svih vlasnikovih klubova.
 
 ### Administrator

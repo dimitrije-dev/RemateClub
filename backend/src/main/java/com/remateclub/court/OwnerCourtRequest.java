@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 public record OwnerCourtRequest(
   @NotBlank @Size(max = 120) String name,
   @NotNull CourtType type,
+  CourtEnvironment environment,
   boolean active,
   @NotNull @DecimalMin(value = "0.01") BigDecimal hourlyPrice
 ) {

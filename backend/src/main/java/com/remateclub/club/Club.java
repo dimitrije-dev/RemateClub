@@ -19,6 +19,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -53,6 +54,21 @@ public class Club {
   @Column(nullable = false, length = 120)
   private String city;
 
+  @Column(length = 255)
+  private String address;
+
+  @Column(precision = 9, scale = 6)
+  private BigDecimal latitude;
+
+  @Column(precision = 9, scale = 6)
+  private BigDecimal longitude;
+
+  @Column(name = "average_rating", nullable = false, precision = 2, scale = 1)
+  private BigDecimal averageRating = BigDecimal.ZERO;
+
+  @Column(name = "review_count", nullable = false)
+  private int reviewCount;
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 30)
   private ClubStatus status;
@@ -86,8 +102,26 @@ public class Club {
   }
 
   public void update(String name, String city) {
+    update(name, city, address, latitude, longitude);
+  }
+
+  public void update(
+    String name,
+    String city,
+    String address,
+    BigDecimal latitude,
+    BigDecimal longitude
+  ) {
     this.name = name;
     this.city = city;
+    this.address = address;
+    this.latitude = latitude;
+    this.longitude = longitude;
+  }
+
+  public void updateRating(BigDecimal averageRating, int reviewCount) {
+    this.averageRating = averageRating;
+    this.reviewCount = reviewCount;
   }
 
   public void approve() {
@@ -112,6 +146,26 @@ public class Club {
 
   public String getCity() {
     return city;
+  }
+
+  public String getAddress() {
+    return address;
+  }
+
+  public BigDecimal getLatitude() {
+    return latitude;
+  }
+
+  public BigDecimal getLongitude() {
+    return longitude;
+  }
+
+  public BigDecimal getAverageRating() {
+    return averageRating;
+  }
+
+  public int getReviewCount() {
+    return reviewCount;
   }
 
   public ClubStatus getStatus() {
