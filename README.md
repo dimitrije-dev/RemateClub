@@ -20,6 +20,41 @@ Remate Club je full-stack platforma za pronalaženje padel klubova, proveru slob
 - Backend računa cenu, zaključava teren i sprečava booking overlap.
 - PostgreSQL šema je u potpunosti vođena Flyway migracijama.
 
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="assets/screenshots/landing.png" alt="Remate Club landing stranica" width="100%" />
+      <br /><strong>Landing stranica</strong>
+    </td>
+    <td width="50%" align="center">
+      <img src="assets/screenshots/login.png" alt="Prijava korisnika u Remate Club aplikaciju" width="100%" />
+      <br /><strong>Prijava korisnika</strong>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="assets/screenshots/clubs.png" alt="Pregled padel klubova i prvih slobodnih termina" width="100%" />
+      <br /><strong>Klubovi i slobodni termini</strong>
+    </td>
+    <td width="50%" align="center">
+      <img src="assets/screenshots/booking-flow.png" alt="Izbor terena, datuma i termina" width="100%" />
+      <br /><strong>Izbor terena i termina</strong>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="assets/screenshots/booking-confirmation.png" alt="Modal za potvrdu rezervacije" width="100%" />
+      <br /><strong>Potvrda rezervacije</strong>
+    </td>
+    <td width="50%" align="center">
+      <img src="assets/screenshots/owner-club-form.png" alt="Owner forma za dodavanje novog kluba" width="100%" />
+      <br /><strong>Dodavanje novog kluba</strong>
+    </td>
+  </tr>
+</table>
+
 ## Tehnologije
 
 | Sloj | Tehnologije |
@@ -199,6 +234,6 @@ backend/                  Spring Boot API
 frontend/                 React/Vite aplikacija
 docs/                     Arhitektura, API i run dokumentacija
 assets/branding/          Logo i banneri za javni README
-assets/notion/            Lokalni task tracker i izveštaji (ne idu na Git)
+assets/screenshots/       Screenshotovi glavnih korisničkih tokova
 docker-compose.yml        Lokalni full-stack runtime
 ```
