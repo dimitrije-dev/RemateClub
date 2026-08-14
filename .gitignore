@@ -11,10 +11,16 @@
 .env.*
 !.env.example
 
-# Local planning exports
-docs/
+# Local planning exports and generated documents
 assets/notion/
 Asstets/notion/
+*.csv
+*.tsv
+output/
+
+# Historical task notes (kept locally, not part of public documentation)
+docs/jwt-access-tokens.md
+docs/refresh-token-model.md
 
 # Logs
 *.log
@@ -24,6 +30,7 @@ yarn-error.log*
 
 # Backend
 backend/target/
+backend/data/
 backend/.mvn/wrapper/maven-wrapper.jar
 
 # Frontend

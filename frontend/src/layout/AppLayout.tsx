@@ -1,5 +1,6 @@
-import { CalendarDays, LogIn, LogOut, UserPlus, UserRound } from 'lucide-react';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Building2, CalendarDays, LayoutDashboard, LogIn, LogOut, ShieldCheck, UserPlus, UserRound } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { Button, ButtonLink } from '../components/ui/Button';
 
@@ -20,6 +21,13 @@ export function AppLayout() {
             <img src="/remate-logo.png" alt="Remate Club" className="h-10 w-10 rounded-xl object-contain" />
             <span className="hidden sm:inline">Remate Club</span>
           </Link>
+          <div className="hidden items-center gap-1 lg:flex">
+            <NavItem to="/clubs" label="Klubovi" icon={<Building2 size={16} />} />
+            {user?.role === 'PLAYER' && <NavItem to="/bookings" label="Rezervacije" icon={<CalendarDays size={16} />} />}
+            {user?.role === 'OWNER' && <NavItem to="/owner" label="Panel" icon={<LayoutDashboard size={16} />} />}
+            {user?.role === 'OWNER' && <NavItem to="/owner/clubs" label="Moji klubovi" icon={<Building2 size={16} />} />}
+            {user?.role === 'ADMIN' && <NavItem to="/admin/clubs/pending" label="Administracija" icon={<ShieldCheck size={16} />} />}
+          </div>
           <div className="flex items-center gap-1.5 sm:gap-2">
             {isAuthenticated && user ? (
               <>
@@ -40,6 +48,13 @@ export function AppLayout() {
             )}
           </div>
         </nav>
+        <nav className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-5 pb-3 lg:hidden" aria-label="Brza navigacija">
+          <NavItem to="/clubs" label="Klubovi" icon={<Building2 size={16} />} />
+          {user?.role === 'PLAYER' && <NavItem to="/bookings" label="Rezervacije" icon={<CalendarDays size={16} />} />}
+          {user?.role === 'OWNER' && <NavItem to="/owner" label="Panel" icon={<LayoutDashboard size={16} />} />}
+          {user?.role === 'OWNER' && <NavItem to="/owner/clubs" label="Moji klubovi" icon={<Building2 size={16} />} />}
+          {user?.role === 'ADMIN' && <NavItem to="/admin/clubs/pending" label="Administracija" icon={<ShieldCheck size={16} />} />}
+        </nav>
       </header>
 
       <main><Outlet /></main>
@@ -52,4 +67,8 @@ export function AppLayout() {
       </footer>
     </div>
   );
+}
+
+function NavItem({ to, label, icon }: { to: string; label: string; icon: ReactNode }) {
+  return <NavLink to={to} className={({ isActive }) => `inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-extrabold transition ${isActive ? 'bg-remate-greenLight text-remate-navy' : 'text-remate-muted hover:bg-remate-bg hover:text-remate-navy'}`}>{icon}{label}</NavLink>;
 }

@@ -67,7 +67,7 @@ public class AuthService {
     return authResponse(savedUser);
   }
 
-  @Transactional(readOnly = true)
+  @Transactional
   public AuthResponse login(LoginRequest request) {
     String email = normalizeEmail(request.email());
     User user = userRepository.findByEmail(email)

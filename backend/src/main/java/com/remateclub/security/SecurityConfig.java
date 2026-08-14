@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -50,6 +51,9 @@ class SecurityConfig {
         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
       )
       .authorizeHttpRequests(auth -> auth
+        .requestMatchers(HttpMethod.GET, "/api/clubs", "/api/clubs/**").permitAll()
+        .requestMatchers(HttpMethod.GET, "/api/club-images/**").permitAll()
+        .requestMatchers(HttpMethod.GET, "/api/courts/*/availability").permitAll()
         .requestMatchers(
           "/api/auth/register",
           "/api/auth/login",

@@ -39,7 +39,7 @@ type ApiErrorBody = {
 
 type RetryableRequest = InternalAxiosRequestConfig & { _retry?: boolean };
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api';
 const REFRESH_TOKEN_KEY = 'remate-club.refresh-token';
 
 let accessToken: string | null = null;
@@ -58,6 +58,12 @@ const refreshClient = axios.create({
 
 export function setAccessToken(token: string | null) {
   accessToken = token;
+}
+
+export function resolveApiAssetUrl(path: string) {
+  if (/^https?:\/\//i.test(path)) return path;
+  const apiUrl = new URL(API_BASE_URL, window.location.origin);
+  return new URL(path, apiUrl.origin).toString();
 }
 
 export function getRefreshToken() {

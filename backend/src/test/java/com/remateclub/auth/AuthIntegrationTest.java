@@ -73,7 +73,7 @@ class AuthIntegrationTest {
   }
 
   @Test
-  void flywayAppliesUsersMigrationAndHibernateValidationStarts() {
+  void flywayAppliesLatestMigrationAndHibernateValidationStarts() {
     String latestVersion = jdbcTemplate.queryForObject(
       "select version from flyway_schema_history where success = true order by installed_rank desc limit 1",
       String.class
@@ -83,7 +83,7 @@ class AuthIntegrationTest {
       Integer.class
     );
 
-    assertThat(latestVersion).isEqualTo("3");
+    assertThat(latestVersion).isEqualTo("8");
     assertThat(usersTableCount).isEqualTo(1);
   }
 
@@ -107,6 +107,9 @@ class AuthIntegrationTest {
       JSON_OBJECT
     );
     assertThat(login.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(login.getBody()).isNotNull();
+    String loginRefreshToken = login.getBody().get("refreshToken").toString();
+    assertThat(refresh(loginRefreshToken).getStatusCode()).isEqualTo(HttpStatus.OK);
 
     ResponseEntity<Map<String, Object>> refresh = refresh(refreshToken);
     assertThat(refresh.getStatusCode()).isEqualTo(HttpStatus.OK);

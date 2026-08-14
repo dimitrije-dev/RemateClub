@@ -1,282 +1,201 @@
 <p align="center">
-  <img src="Asstets/Final_github_banner.png" alt="Remate Club banner" width="100%" />
-</p>
-
-<p align="center">
-  <a href="#"><img alt="Java" src="https://img.shields.io/badge/Java_21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white"></a>
-  <a href="#"><img alt="Spring Boot" src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"></a>
-  <a href="#"><img alt="Maven" src="https://img.shields.io/badge/Maven-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white"></a>
-  <a href="#"><img alt="React" src="https://img.shields.io/badge/React_19-61DAFB?style=for-the-badge&logo=react&logoColor=111111"></a>
-  <a href="#"><img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white"></a>
-  <a href="#"><img alt="Vite" src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white"></a>
-  <a href="#"><img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white"></a>
-  <a href="#"><img alt="TanStack Query" src="https://img.shields.io/badge/TanStack_Query-FF4154?style=for-the-badge&logo=reactquery&logoColor=white"></a>
-  <a href="#"><img alt="Axios" src="https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white"></a>
-  <a href="#"><img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"></a>
-  <a href="#"><img alt="Flyway" src="https://img.shields.io/badge/Flyway-CC0200?style=for-the-badge&logo=flyway&logoColor=white"></a>
-  <a href="#"><img alt="Docker" src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"></a>
-  <a href="#"><img alt="JWT" src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white"></a>
-  <a href="#"><img alt="OpenAPI" src="https://img.shields.io/badge/OpenAPI-6BA539?style=for-the-badge&logo=openapiinitiative&logoColor=white"></a>
+  <img src="assets/branding/Final_github_banner.png" alt="Remate Club banner" width="100%" />
 </p>
 
 # Remate Club
 
-Remate Club is a full-stack padel court reservation platform for players, club owners, and administrators. It helps players discover clubs, review available courts and time slots, and create reservations through a clear, role-aware booking flow.
+Remate Club je full-stack platforma za pronalaženje padel klubova, proveru slobodnih termina i rezervaciju terena. Aplikacija ima odvojene tokove za igrače, vlasnike klubova i administratore, dok backend kontroliše cenu, dostupnost, ownership i zaštitu od duplog bukiranja.
 
-The project is built as a full-stack monorepo: a React + TypeScript frontend for the user experience, a Spring Boot API for business logic and security, and PostgreSQL as the persistent data layer.
+## Šta trenutno radi
 
-> Current implementation note: the project foundation is in place and Phase 2 is focused on authentication, users, security, API error handling, and database migrations before expanding into clubs, courts, and bookings.
+- Javni landing, pretraga klubova, cover fotografije i galerija odobrenog kluba.
+- Pregled terena, cena i slobodnih termina po datumu.
+- Registracija i prijava za `PLAYER` i `OWNER` naloge.
+- JWT access token i rotirajući refresh token.
+- Igrač kreira, pregleda i otkazuje svoje rezervacije.
+- Vlasnik kreira i uređuje klubove i terene i prati rezervacije.
+- Vlasnik dodaje do osam fotografija, bira cover sliku i briše fotografije kluba.
+- Administrator pregleda, odobrava i odbija klubove na čekanju.
+- Backend računa cenu, zaključava teren i sprečava booking overlap.
+- PostgreSQL šema je u potpunosti vođena Flyway migracijama.
 
-## Product Vision
+## Tehnologije
 
-Remate Club aims to make padel reservations easier for players and more manageable for club owners. The long-term goal is a reliable reservation system where availability, ownership, approvals, and booking rules are enforced by the backend instead of trusted to the client.
-
-The platform is designed around four core ideas:
-
-- **Fast court discovery**: players should quickly find clubs, courts, and available time slots.
-- **Reliable booking rules**: reservation conflicts, blocked court periods, and pricing are controlled server-side.
-- **Role-based workflows**: players, owners, and admins get separate permissions and views.
-- **Clean local development**: Docker Compose, PostgreSQL, Flyway, and OpenAPI keep the development loop predictable.
-
-## Application Modules
-
-| Area | Purpose |
+| Sloj | Tehnologije |
 | --- | --- |
-| Authentication | Player and owner registration, login, refresh tokens, JWT sessions, and current-user context. |
-| Users | User identity, role, status, password hashing, and account lifecycle rules. |
-| Clubs | Public club discovery, owner-managed club profiles, and admin approval flow. |
-| Courts | Court inventory, court type, active status, and club ownership relationships. |
-| Availability | Date-based slot calculation using bookings and owner-defined court blocks. |
-| Bookings | Reservation creation, conflict detection, cancellation rules, and booking history. |
-| Admin | Club approval, rejection, moderation, and elevated operational access. |
-| API Documentation | Swagger/OpenAPI documentation for testing and documenting backend endpoints. |
+| Frontend | React 19, TypeScript, Vite, React Router, TanStack Query, Axios, Tailwind CSS |
+| Backend | Java 21, Spring Boot 3.5, Spring Security, Spring Data JPA, Bean Validation |
+| Baza | PostgreSQL 16, Flyway |
+| Auth | BCrypt, JWT access token, rotirajući refresh token |
+| Testovi | JUnit, Mockito, Testcontainers, Vitest, Testing Library |
+| Lokalno okruženje | Docker Compose, Nginx |
 
-## Architecture
+## Najbrže pokretanje — Docker
 
-```mermaid
-flowchart LR
-  subgraph Client["React Client"]
-    UI["Feature Pages"]
-    Router["React Router"]
-    Query["TanStack Query"]
-    Forms["React Hook Form + Zod"]
-    ApiClient["Axios API Client"]
-  end
-
-  subgraph API["Spring Boot API"]
-    Controllers["REST Controllers"]
-    Security["Spring Security + JWT"]
-    Services["Domain Services"]
-    Validation["Bean Validation"]
-    Errors["Global Exception Handler"]
-    Swagger["OpenAPI / Swagger"]
-  end
-
-  subgraph Data["Data Layer"]
-    JPA["Spring Data JPA"]
-    Flyway["Flyway Migrations"]
-    Postgres["PostgreSQL"]
-  end
-
-  subgraph Infra["Local Infrastructure"]
-    Compose["Docker Compose"]
-    BackendContainer["Backend Container"]
-    FrontendContainer["Frontend Container"]
-    DbContainer["PostgreSQL Container"]
-  end
-
-  UI --> Router
-  UI --> Query
-  UI --> Forms
-  Query --> ApiClient
-  ApiClient --> Controllers
-  Controllers --> Security
-  Controllers --> Validation
-  Controllers --> Services
-  Services --> JPA
-  JPA --> Postgres
-  Flyway --> Postgres
-  Controllers --> Errors
-  Controllers --> Swagger
-  Compose --> BackendContainer
-  Compose --> FrontendContainer
-  Compose --> DbContainer
-```
-
-### Frontend
-
-The frontend is a React application organized around pages, reusable UI components, routing, API access, and shared styles.
-
-Key frontend choices:
-
-- **React 19** for the web application UI.
-- **Vite** for fast local development and production builds.
-- **TypeScript** for stronger frontend contracts.
-- **React Router** for route structure and future protected routes.
-- **TanStack Query** for server-state fetching and caching.
-- **Axios** for backend HTTP communication.
-- **React Hook Form + Zod** for form state and validation.
-- **Tailwind CSS** for the Remate Club visual system.
-
-### Backend
-
-The backend is a modular Spring Boot API prepared for authentication, role-aware access control, validation, database migrations, and OpenAPI documentation.
-
-Key backend choices:
-
-- **Java 21** as the backend runtime target.
-- **Spring Boot 3.5.x** for the API foundation.
-- **Spring Web** for REST endpoints.
-- **Spring Security** for stateless security and future JWT authentication.
-- **Spring Data JPA** for relational persistence.
-- **Bean Validation** for request validation.
-- **Flyway** for versioned database migrations.
-- **Springdoc OpenAPI** for Swagger UI and API contracts.
-
-### Database
-
-PostgreSQL is the source of truth for users, roles, clubs, courts, bookings, court blocks, refresh tokens, and future audit-friendly reservation data. The schema is intended to evolve through Flyway migrations, while Hibernate runs in validation mode so the database remains migration-driven.
-
-## Repository Structure
-
-```text
-remate-club/
-  backend/
-    src/main/java/com/remateclub/
-      auth/                 # Authentication module
-      user/                 # User domain
-      club/                 # Club domain
-      court/                # Court domain
-      booking/              # Booking domain
-      availability/         # Availability domain
-      common/               # Shared config, responses, exceptions, health
-      security/             # Spring Security configuration
-    src/main/resources/
-      db/migration/         # Flyway migrations
-      application.yml       # Backend configuration
-  frontend/
-    src/
-      components/           # Reusable UI components
-      layout/               # App layout
-      pages/                # Landing, auth, error pages
-      routes/               # React Router setup
-      services/             # API client
-      styles/               # Tailwind entry styles
-  assets/
-    notion/                 # Planning exports and task tracking
-  Asstets/                  # Branding images used by GitHub README
-  docker-compose.yml        # Local full-stack runtime
-```
-
-## Getting Started
-
-### Prerequisites
-
-- Docker Desktop
-- Java 21
-- Maven
-- Node.js 20+ or 22+
-- npm
-
-### Environment
-
-Copy the example environment file before local development:
+Potrebni su samo Docker Desktop i slobodni portovi.
 
 ```bash
 cp .env.example .env
+docker compose up -d --build
 ```
 
-Do not commit real secrets.
+Otvori:
 
-### Run With Docker
+- Frontend: <http://localhost:5173>
+- Backend health: <http://localhost:8080/api/health>
+- Swagger UI: <http://localhost:8080/swagger-ui.html>
+- OpenAPI JSON: <http://localhost:8080/v3/api-docs>
 
-```bash
-docker compose up --build
-```
-
-Default service URLs:
-
-- Frontend: http://localhost:5173
-- Backend: http://localhost:8080
-- Swagger UI: http://localhost:8080/swagger-ui.html
-- OpenAPI JSON: http://localhost:8080/v3/api-docs
-- PostgreSQL: localhost:5432
-
-If local ports are already occupied, override them for the current run:
+Ako su `5173` ili `5432` zauzeti:
 
 ```bash
 FRONTEND_PORT=5174 POSTGRES_PORT=5433 docker compose up -d --build
 ```
 
-### Backend
+Tada je frontend na <http://localhost:5174>. Za logove i gašenje:
+
+```bash
+docker compose logs -f
+docker compose down
+```
+
+Podaci ostaju u Docker volumenu. Potpuno brisanje lokalne baze je namerna, destruktivna operacija i radi se samo komandom `docker compose down -v`.
+
+## Razvojni nalozi
+
+Docker Compose podrazumevano uključuje Spring profil `dev`. Seeder je idempotentan i kreira sledeće naloge samo u tom profilu:
+
+| Uloga | Email | Lozinka | Početni ekran |
+| --- | --- | --- | --- |
+| Igrač | `player@remate.local` | `Remate123!` | `/bookings` |
+| Vlasnik | `owner@remate.local` | `Remate123!` | `/owner` |
+| Administrator | `admin@remate.local` | `Remate123!` | `/admin/clubs/pending` |
+
+Seed uključuje i odobren klub **Remate Arena Dorćol**, dva aktivna terena i jedan klub koji čeka admin odluku. Profil `dev` nikada ne uključivati u produkciji.
+
+## Lokalno pokretanje bez Docker frontend/backend kontejnera
+
+### 1. PostgreSQL
+
+```bash
+docker compose up -d postgres
+```
+
+### 2. Backend
+
+Potrebni su Java 21 i Maven:
 
 ```bash
 cd backend
+SPRING_PROFILES_ACTIVE=dev mvn spring-boot:run
+```
+
+Ako je PostgreSQL mapiran na `5433`:
+
+```bash
+SPRING_PROFILES_ACTIVE=dev \
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/remate_club \
 mvn spring-boot:run
 ```
 
-Health check:
+### 3. Frontend
+
+Potrebni su Node.js 20.19+ i npm:
 
 ```bash
-curl http://localhost:8080/api/health
+cd frontend
+npm ci
+npm run dev
 ```
 
-Run backend tests:
+Frontend koristi `VITE_API_BASE_URL` iz [frontend/.env.example](frontend/.env.example), a backend promenljive su opisane u [backend/.env.example](backend/.env.example).
+
+## Kako proći kroz aplikaciju
+
+### Javni deo
+
+1. Otvori `/` i unesi grad u hero pretragu.
+2. Na `/clubs` filtriraj odobrene klubove po nazivu ili gradu.
+3. Otvori `/clubs/{clubId}`, izaberi teren i datum.
+4. Slobodni slot prikazuje backend cenu; zauzeti ili blokirani slot je onemogućen.
+
+### Igrač
+
+1. Prijavi se kao `player@remate.local` ili registruj novi PLAYER nalog.
+2. Izaberi slobodan termin na detaljima kluba i potvrdi ga klikom na slot.
+3. `/bookings` prikazuje istoriju, a `/bookings/{bookingId}` detalje i otkazivanje.
+4. `/profile` prikazuje identitet, status i prečicu ka rezervacijama.
+
+### Vlasnik
+
+1. Prijavi se kao `owner@remate.local`.
+2. `/owner` prikazuje KPI pregled i brze akcije.
+3. `/owner/clubs` prikazuje klubove; novi klub ulazi u `PENDING_APPROVAL`.
+4. Editor menja naziv i grad, a ekran terena dodaje/menja tip, cenu i aktivnost.
+5. `/owner/reservations` prikazuje rezervacije svih vlasnikovih klubova.
+
+### Administrator
+
+1. Prijavi se kao `admin@remate.local`.
+2. Otvori `/admin/clubs/pending`.
+3. Odobri klub da postane javan ili ga odbij. Lista se automatski osvežava.
+
+## Testovi i build
 
 ```bash
 cd backend
 mvn test
 ```
 
-### Frontend
+Backend integracioni testovi koriste PostgreSQL 16 kroz Testcontainers, pa Docker mora biti pokrenut.
 
 ```bash
 cd frontend
-npm install
-npm run dev
-```
-
-Run frontend checks:
-
-```bash
-cd frontend
+npm test -- --run
 npm run typecheck
 npm run build
-npm test
 ```
 
-## Current Status
+## Dokumentacija
 
-Implemented or scaffolded:
+- [API endpointi](docs/api-endpoints.md) — implementirane rute, pristup i namena.
+- [Arhitektura](docs/architecture.md) — moduli, bezbednosna pravila i booking tok.
+- [Komande za pokretanje](docs/run-commands.md) — Docker, backend, frontend i testovi.
+- [Status implementacije](docs/implementation-plan.md) — završen MVP i naredne iteracije.
 
-- Monorepo structure with backend, frontend, assets, and planning exports.
-- Docker Compose stack for PostgreSQL, backend, and frontend.
-- Local PostgreSQL container with persistent volume and healthcheck.
-- Spring Boot backend foundation with Java 21, Maven, Security, JPA, Flyway, PostgreSQL driver, and Swagger/OpenAPI.
-- Backend health endpoint at `/api/health`.
-- User domain with roles, statuses, BCrypt password hashing, and users Flyway migration.
-- Auth endpoints for registration, login, and current-user context.
-- Refresh endpoint with hashed opaque token storage and rotation.
-- JWT access token creation and validation through Spring Security Resource Server.
-- DB-backed refresh token model prepared for secure token renewal.
-- Consistent backend JSON error handling.
-- React + Vite + TypeScript frontend foundation.
-- Landing, login, registration, and not-found pages.
-- Shared frontend button component, app layout, router setup, API client, Tailwind configuration, and tests.
-- Root README, `.gitignore`, `.env.example`, backend env example, and frontend env example.
+Interaktivni API ugovor dostupan je kroz Swagger UI dok backend radi.
 
-Next priorities:
+## Dodavanje slika kluba
 
-- Build protected frontend auth flow connected to backend endpoints.
-- Add frontend auth state, protected routes, and form validation.
-- Continue into clubs, courts, ownership rules, and booking foundation.
+Vlasnik otvara **Moji klubovi → Uredi → Fotografije**, bira fajl, upisuje kratak opis i po želji označava sliku kao cover. Prva dodata slika automatski postaje cover. Klub može imati najviše osam slika, a posle uploada cover može da se promeni ili slika obriše.
 
-<br />
+| Namena | Preporučena rezolucija | Odnos | Format |
+| --- | --- | --- | --- |
+| Cover kluba | `1600 × 900 px` | 16:9 | WebP ili JPEG |
+| Galerija | `1600 × 1200 px` | 4:3 | WebP ili JPEG |
+| Logo sa providnom pozadinom | `800 × 800 px` | 1:1 | PNG |
 
-<p align="center">
-  <img src="Asstets/LogoV1.png" alt="Remate Club logo" width="120" />
-</p>
+Pravila uploada:
 
-<p align="center">
-  <strong>Remate Club helps players find courts faster, clubs manage availability better, and reservations stay reliable from the first click to match time.</strong>
-</p>
+- podržani su JPEG, PNG i WebP;
+- WebP je preporučen za fotografije jer daje dobar kvalitet uz manji fajl;
+- minimalna rezolucija je `600 × 400 px`, maksimalna `6000 × 6000 px`;
+- maksimalna veličina je 5 MB po slici;
+- HEIC/HEIF fotografije sa telefona prvo treba izvesti kao WebP ili JPEG;
+- opis slike je obavezan i služi kao `alt` tekst za pristupačnost;
+- server proverava stvarni format i dimenzije, a ne samo ekstenziju fajla.
+
+U Docker okruženju fajlovi se trajno čuvaju u volumenu `club_images`, dok PostgreSQL čuva metapodatke i bezbedan UUID storage ključ. Za produkciju je preporučena zamena lokalnog direktorijuma S3/Cloudinary/R2 skladištem i CDN-om; API i UI mogu ostati isti.
+
+Dodatni vizuelni koraci koji još imaju smisla su landing hero fotografija, mapa/lokacija, avatar ili logo kluba, Open Graph slika i empty-state ilustracije.
+
+## Struktura
+
+```text
+backend/                  Spring Boot API
+frontend/                 React/Vite aplikacija
+docs/                     Arhitektura, API i run dokumentacija
+assets/branding/          Logo i banneri za javni README
+assets/notion/            Lokalni task tracker i izveštaji (ne idu na Git)
+docker-compose.yml        Lokalni full-stack runtime
+```

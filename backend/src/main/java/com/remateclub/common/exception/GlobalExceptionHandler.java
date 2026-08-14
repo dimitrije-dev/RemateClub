@@ -1,5 +1,6 @@
 package com.remateclub.common.exception;
 
+import com.remateclub.booking.BookingTimeUnavailableException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.util.Comparator;
@@ -12,6 +13,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -113,6 +115,21 @@ public class GlobalExceptionHandler {
       ));
   }
 
+  @ExceptionHandler(BookingTimeUnavailableException.class)
+  ResponseEntity<ErrorResponse> handleBookingTimeUnavailable(
+    BookingTimeUnavailableException exception,
+    HttpServletRequest request
+  ) {
+    return ResponseEntity
+      .status(HttpStatus.CONFLICT)
+      .body(ErrorResponse.of(
+        HttpStatus.CONFLICT,
+        "BOOKING_TIME_UNAVAILABLE",
+        exception.getMessage(),
+        request.getRequestURI()
+      ));
+  }
+
   @ExceptionHandler(BadRequestException.class)
   ResponseEntity<ErrorResponse> handleBadRequestException(
     BadRequestException exception,
@@ -124,6 +141,21 @@ public class GlobalExceptionHandler {
         HttpStatus.BAD_REQUEST,
         "BAD_REQUEST",
         exception.getMessage(),
+        request.getRequestURI()
+      ));
+  }
+
+  @ExceptionHandler(MaxUploadSizeExceededException.class)
+  ResponseEntity<ErrorResponse> handleMaxUploadSize(
+    MaxUploadSizeExceededException exception,
+    HttpServletRequest request
+  ) {
+    return ResponseEntity
+      .status(HttpStatus.PAYLOAD_TOO_LARGE)
+      .body(ErrorResponse.of(
+        HttpStatus.PAYLOAD_TOO_LARGE,
+        "PAYLOAD_TOO_LARGE",
+        "Slika može imati najviše 5 MB",
         request.getRequestURI()
       ));
   }

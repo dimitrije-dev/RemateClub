@@ -77,4 +77,104 @@ code {
   .profile-badge {
     @apply inline-flex items-center gap-2 rounded-full bg-remate-bg px-3 py-2;
   }
+
+  .page-shell {
+    @apply mx-auto min-h-[62vh] max-w-6xl px-5 py-12 sm:py-16;
+  }
+
+  .page-heading {
+    @apply flex flex-col justify-between gap-5 sm:flex-row sm:items-end;
+  }
+
+  .page-heading h1 {
+    @apply mt-2 text-4xl font-black tracking-tight sm:text-5xl;
+  }
+
+  .page-heading p:not(.eyebrow) {
+    @apply mt-3 max-w-2xl text-remate-muted;
+  }
+
+  .surface-card {
+    @apply rounded-remate border border-white bg-white p-6 shadow-sm;
+  }
+
+  .state-card {
+    @apply flex min-h-40 items-center justify-center gap-4 rounded-remate border border-white bg-white p-7 text-remate-navy shadow-sm;
+  }
+
+  .back-link {
+    @apply inline-flex items-center gap-2 text-sm font-black text-remate-muted transition hover:text-remate-navy;
+  }
+
+  .result-pill {
+    @apply inline-flex w-fit items-center gap-2 rounded-full bg-remate-greenLight px-4 py-2 text-sm font-black;
+  }
+
+  .status-badge {
+    @apply inline-flex rounded-full px-3 py-1.5 text-xs font-black uppercase tracking-wide;
+  }
+
+  .status-pending,
+  .status-pending_approval {
+    @apply bg-amber-100 text-amber-800;
+  }
+
+  .status-approved,
+  .status-confirmed {
+    @apply bg-emerald-100 text-emerald-800;
+  }
+
+  .status-rejected,
+  .status-cancelled {
+    @apply bg-red-100 text-red-800;
+  }
+
+  .status-completed {
+    @apply bg-slate-200 text-slate-700;
+  }
+
+  .status-suspended {
+    @apply bg-slate-800 text-white;
+  }
+
+  .slot-button {
+    @apply flex min-h-16 items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition;
+  }
+
+  .slot-available {
+    @apply border-emerald-200 bg-emerald-50 hover:-translate-y-0.5 hover:border-emerald-500 hover:shadow-sm;
+  }
+
+  .slot-unavailable {
+    @apply cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400;
+  }
+
+  .metric-card {
+    @apply rounded-remate bg-white p-5 shadow-sm;
+  }
+
+  .metric-card span {
+    @apply text-emerald-600;
+  }
+
+  .metric-card p {
+    @apply mt-4 text-sm font-bold text-remate-muted;
+  }
+
+  .metric-card strong {
+    @apply mt-1 block text-3xl font-black;
+  }
+
+  .form-select {
+    @apply mt-2 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 outline-none transition focus:border-remate-green focus:ring-2 focus:ring-remate-green/20;
+  }
+}
+
+.hero-grid::before {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(79, 208, 156, 0.055) 1px, transparent 1px), linear-gradient(90deg, rgba(79, 208, 156, 0.055) 1px, transparent 1px);
+  background-size: 44px 44px;
+  content: '';
+  pointer-events: none;
 }

@@ -1,11 +1,14 @@
 import { Building2, CalendarDays, ShieldCheck, UserRound } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
+import { ButtonLink } from '../components/ui/Button';
 
 const roleLabels = { PLAYER: 'Igrač', OWNER: 'Vlasnik kluba', ADMIN: 'Administrator' } as const;
 
 export function ProfilePage() {
   const { user } = useAuth();
   if (!user) return null;
+  const destination = user.role === 'PLAYER' ? '/bookings' : user.role === 'OWNER' ? '/owner' : '/admin';
+  const destinationLabel = user.role === 'PLAYER' ? 'Moje rezervacije' : user.role === 'OWNER' ? 'Vlasnički panel' : 'Administracija';
 
   return (
     <section className="mx-auto max-w-5xl px-5 py-14">
@@ -26,7 +29,8 @@ export function ProfilePage() {
         <article className="rounded-remate bg-remate-navy p-7 text-white shadow-soft">
           <Building2 className="text-remate-green" />
           <h2 className="mt-5 text-xl font-black">Sledeći korak</h2>
-          <p className="mt-2 text-white/70">Klubovi, tereni i rezervacije dolaze u narednoj razvojnoj fazi.</p>
+          <p className="mt-2 text-white/70">Nastavi tamo gde tvoja uloga ima najviše smisla.</p>
+          <ButtonLink to={destination} className="mt-5">{destinationLabel}</ButtonLink>
         </article>
       </div>
     </section>
